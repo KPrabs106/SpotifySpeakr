@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
             @Override
             public void onClick(View v) {
                 mPlayer.skipToPrevious();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
             @Override
             public void onClick(View v) {
                 mPlayer.skipToNext();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -135,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                     Log.d("trackURIs", trackURIs.toString());
                     playConfig = PlayConfig.createFor(trackURIs);
                     playButton.setClickable(true);
+                    pauseButton.setClickable(true);
                     previousButton.setClickable(true);
                     nextButton.setClickable(true);
 
