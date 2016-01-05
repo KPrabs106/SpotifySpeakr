@@ -8,6 +8,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -17,6 +22,9 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PlayerNotificationCallback, ConnectionStateCallback {
 
@@ -31,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
+        ParseObject.registerSubclass(Queue.class);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
@@ -53,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                         mPlayer = player;
                         mPlayer.addConnectionStateCallback(MainActivity.this);
                         mPlayer.addPlayerNotificationCallback(MainActivity.this);
-                        mPlayer.play("spotify:track:7zQpkjbgrNJRWy0RZNwNee");
+                        startPlayingMusic();
                     }
 
                     @Override
@@ -63,6 +74,25 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                 });
             }
         }
+    }
+
+    public void startPlayingMusic() {
+        ParseQuery<Queue> query = ParseQuery.getQuery(Queue.class);
+        query.findInBackground(new FindCallback<Queue>() {
+            @Override
+            public void done(List<Queue> objects, ParseException e) {
+                if (e == null) {
+                    Log.d("no error", objects.toString());
+                    ArrayList<String> trackURIs = new ArrayList<>();
+                    for (int i = 0; i < objects.size(); i++) {
+                        trackURIs.add("spotify:track:" + objects.get(i).getTrackID());
+                    }
+                    Log.d("trackURIs", trackURIs.toString());
+                    mPlayer.play(trackURIs);
+                } else
+                    Log.e("error", e.getMessage());
+            }
+        });
     }
 
     @Override
