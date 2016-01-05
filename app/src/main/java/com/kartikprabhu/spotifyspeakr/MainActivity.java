@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
 
         Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
         ParseObject.registerSubclass(Queue.class);
+        ParseInstallation.getCurrentInstallation().saveInBackground();
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
