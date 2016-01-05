@@ -12,7 +12,9 @@
     <permission
         android:name="com.kartikprabhu.spotifyspeakr.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="com.kartikprabhu.spotifyspeakr.permission.C2D_MESSAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,7 +38,7 @@
         <service android:name="com.parse.PushService" />
 
         <receiver
-            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:name="com.kartikprabhu.spotifyspeakr.CustomParseReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -54,6 +56,11 @@
                 <category android:name="com.kartikprabhu.spotifyspeakr" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".SpotifyMusicPlayer"
+            android:label="@string/title_activity_spotify_music_player"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

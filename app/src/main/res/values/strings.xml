@@ -3,4 +3,5 @@
     <string name="action_settings">Settings</string>
     <string name="parse_app_id">macO7azBXFEy5WMf4HrO17d0YxyOkL6T7S5JaFNB</string>
     <string name="parse_client_key">JSBKqoaBn7wdpdLZfDM2rsUoeTXWFEtKss1UQhGK</string>
+    <string name="title_activity_spotify_music_player">SpotifyMusicPlayer</string>
 </resources>

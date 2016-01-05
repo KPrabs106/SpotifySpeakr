@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
 import com.parse.Parse;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
@@ -28,6 +30,7 @@ import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PlayerNotificationCallback, ConnectionStateCallback {
@@ -35,8 +38,9 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
     private static final String CLIENT_ID = "4723a618582148fa80b22e70b2cac6bc";
     private static final String REDIRECT_URI = "spotifyspeakr://callback/";
     private static final int REQUEST_CODE = 1738;
+    private static Player mPlayer;
     PlayConfig playConfig;
-    private Player mPlayer;
+    HashMap<String, String> params = new HashMap<String, String>();
     private ImageButton playButton;
     private ImageButton pauseButton;
     private ImageButton previousButton;
@@ -48,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        params.put("X-Parse-Application-Id", getResources().getString(R.string.parse_app_id));
+        params.put("X-Parse-REST-API-Key", getResources().getString(R.string.api_key));
+        params.put("Content-Type", "application/json");
 
         playButton = (ImageButton) findViewById(R.id.play_button);
         pauseButton = (ImageButton) findViewById(R.id.pause_button);
@@ -93,6 +101,15 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
         ParseObject.registerSubclass(Queue.class);
         ParseInstallation.getCurrentInstallation().saveInBackground();
+
+        ParseCloud.callFunctionInBackground("getTime", params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object object, ParseException e) {
+                Log.e("server time", String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", ""))));
+                Log.e("system time", String.valueOf(System.currentTimeMillis()));
+                Log.e("offset", String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", "")) - System.currentTimeMillis()));
+            }
+        });
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
