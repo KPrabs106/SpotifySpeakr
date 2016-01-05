@@ -7,6 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -18,6 +20,7 @@ import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
+import com.spotify.sdk.android.player.PlayConfig;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
@@ -31,7 +34,12 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
     private static final String CLIENT_ID = "4723a618582148fa80b22e70b2cac6bc";
     private static final String REDIRECT_URI = "spotifyspeakr://callback/";
     private static final int REQUEST_CODE = 1738;
+    PlayConfig playConfig;
     private Player mPlayer;
+    private ImageButton playButton;
+    private ImageButton pauseButton;
+    private ImageButton previousButton;
+    private ImageButton nextButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,43 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        playButton = (ImageButton) findViewById(R.id.play_button);
+        pauseButton = (ImageButton) findViewById(R.id.pause_button);
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayer.resume();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayer.pause();
+                playButton.setVisibility(View.VISIBLE);
+                pauseButton.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        previousButton = (ImageButton) findViewById(R.id.previous_button);
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayer.skipToPrevious();
+            }
+        });
+
+        nextButton = (ImageButton) findViewById(R.id.next_button);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayer.skipToNext();
+            }
+        });
 
         Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
         ParseObject.registerSubclass(Queue.class);
@@ -88,7 +133,13 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                         trackURIs.add("spotify:track:" + objects.get(i).getTrackID());
                     }
                     Log.d("trackURIs", trackURIs.toString());
-                    mPlayer.play(trackURIs);
+                    playConfig = PlayConfig.createFor(trackURIs);
+                    playButton.setClickable(true);
+                    previousButton.setClickable(true);
+                    nextButton.setClickable(true);
+
+                    mPlayer.play(playConfig);
+                    mPlayer.pause();
                 } else
                     Log.e("error", e.getMessage());
             }
