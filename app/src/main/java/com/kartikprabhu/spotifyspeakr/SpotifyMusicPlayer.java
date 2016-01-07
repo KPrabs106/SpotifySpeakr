@@ -47,8 +47,6 @@ public class SpotifyMusicPlayer extends AppCompatActivity implements PlayerNotif
 
         trackURI = getIntent().getExtras().getString("trackURI");
         time = getIntent().getExtras().getString("time");
-        Log.e("trackURIPlayer", trackURI);
-
 
         params.put("X-Parse-Application-Id", getResources().getString(R.string.parse_app_id));
         params.put("X-Parse-REST-API-Key", getResources().getString(R.string.api_key));
@@ -98,9 +96,9 @@ public class SpotifyMusicPlayer extends AppCompatActivity implements PlayerNotif
         ParseCloud.callFunctionInBackground("getTime", params, new FunctionCallback<Object>() {
             @Override
             public void done(Object object, ParseException e) {
-                Log.e("server time", String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", ""))));
-                Log.e("system time", String.valueOf(System.currentTimeMillis()));
-                offset = String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", "")) - System.currentTimeMillis());
+                Log.d("server time", String.valueOf(object));
+                Log.d("system time", String.valueOf(System.currentTimeMillis()));
+                offset = String.valueOf(Long.parseLong(String.valueOf(object)) - System.currentTimeMillis());
             }
         });
 
@@ -150,36 +148,51 @@ public class SpotifyMusicPlayer extends AppCompatActivity implements PlayerNotif
 
     @Override
     public void onLoggedIn() {
-
+        Log.d("MainActivity", "User logged in");
     }
 
     @Override
     public void onLoggedOut() {
-
+        Log.d("MainActivity", "User logged out");
     }
 
     @Override
     public void onLoginFailed(Throwable throwable) {
-
+        Log.d("MainActivity", "Login failed");
     }
 
     @Override
     public void onTemporaryError() {
-
+        Log.d("MainActivity", "Temporary error occurred");
     }
 
     @Override
     public void onConnectionMessage(String s) {
-
+        Log.d("MainActivity", "Received connection message: " + s);
     }
+
 
     @Override
     public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-
+        Log.d("MainActivity", "Playback event received: " + eventType.name());
+        switch (eventType) {
+            default:
+                break;
+        }
     }
 
     @Override
     public void onPlaybackError(ErrorType errorType, String s) {
+        Log.d("MainActivity", "Playback error received: " + errorType.name());
+        switch (errorType) {
+            default:
+                break;
+        }
+    }
 
+    @Override
+    protected void onDestroy() {
+        Spotify.destroyPlayer(this);
+        super.onDestroy();
     }
 }

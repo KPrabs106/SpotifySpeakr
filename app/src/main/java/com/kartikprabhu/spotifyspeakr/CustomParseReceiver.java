@@ -2,7 +2,6 @@ package com.kartikprabhu.spotifyspeakr;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.parse.ParsePushBroadcastReceiver;
 
@@ -17,10 +16,8 @@ public class CustomParseReceiver extends ParsePushBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         try {
             JSONObject jsonObject = new JSONObject(intent.getExtras().getString("com.parse.Data"));
-            Log.e("json", jsonObject.toString());
             String time = jsonObject.getString("time");
             String trackURI = jsonObject.getString("trackURI");
-            Log.e("trackURIRecevier", trackURI);
             Intent musicIntent = new Intent(context, SpotifyMusicPlayer.class);
             musicIntent.putExtra("trackURI", trackURI);
             musicIntent.putExtra("time", time);

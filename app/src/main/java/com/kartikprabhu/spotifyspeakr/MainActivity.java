@@ -1,6 +1,5 @@
 package com.kartikprabhu.spotifyspeakr;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -8,43 +7,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.Parse;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.spotify.sdk.android.authentication.AuthenticationRequest;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.player.Config;
-import com.spotify.sdk.android.player.ConnectionStateCallback;
-import com.spotify.sdk.android.player.PlayConfig;
-import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.PlayerNotificationCallback;
-import com.spotify.sdk.android.player.PlayerState;
-import com.spotify.sdk.android.player.Spotify;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PlayerNotificationCallback, ConnectionStateCallback {
+public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "4723a618582148fa80b22e70b2cac6bc";
-    private static final String REDIRECT_URI = "spotifyspeakr://callback/";
-    private static final int REQUEST_CODE = 1738;
-    private static Player mPlayer;
-    PlayConfig playConfig;
     HashMap<String, String> params = new HashMap<String, String>();
     private ImageButton playButton;
-    private ImageButton pauseButton;
-    private ImageButton previousButton;
-    private ImageButton nextButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,166 +37,29 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         params.put("Content-Type", "application/json");
 
         playButton = (ImageButton) findViewById(R.id.play_button);
-        pauseButton = (ImageButton) findViewById(R.id.pause_button);
+
+        final EditText desiredTrack = (EditText) findViewById(R.id.editText);
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayer.resume();
-                playButton.setVisibility(View.INVISIBLE);
-                pauseButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayer.pause();
-                playButton.setVisibility(View.VISIBLE);
-                pauseButton.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        previousButton = (ImageButton) findViewById(R.id.previous_button);
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayer.skipToPrevious();
-                playButton.setVisibility(View.INVISIBLE);
-                pauseButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        nextButton = (ImageButton) findViewById(R.id.next_button);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayer.skipToNext();
-                playButton.setVisibility(View.INVISIBLE);
-                pauseButton.setVisibility(View.VISIBLE);
+                params.put("trackuri", String.valueOf(desiredTrack.getText()));
+                ParseCloud.callFunctionInBackground("playMusic", params, new FunctionCallback<Object>() {
+                    @Override
+                    public void done(Object object, ParseException e) {
+                        if (e != null) {
+                            Log.e("Server error", e.getMessage());
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Your track will start playing in less than 10 seconds", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
         Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
         ParseObject.registerSubclass(Queue.class);
         ParseInstallation.getCurrentInstallation().saveInBackground();
-
-        ParseCloud.callFunctionInBackground("getTime", params, new FunctionCallback<Object>() {
-            @Override
-            public void done(Object object, ParseException e) {
-                Log.e("server time", String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", ""))));
-                Log.e("system time", String.valueOf(System.currentTimeMillis()));
-                Log.e("offset", String.valueOf(Long.parseLong(String.valueOf(object).substring(0, 14).replace(".", "")) - System.currentTimeMillis()));
-            }
-        });
-
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
-        AuthenticationRequest request = builder.build();
-
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, data);
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-                    @Override
-                    public void onInitialized(Player player) {
-                        mPlayer = player;
-                        mPlayer.addConnectionStateCallback(MainActivity.this);
-                        mPlayer.addPlayerNotificationCallback(MainActivity.this);
-                        startPlayingMusic();
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-                    }
-                });
-            }
-        }
-    }
-
-    public void startPlayingMusic() {
-        ParseQuery<Queue> query = ParseQuery.getQuery(Queue.class);
-        query.findInBackground(new FindCallback<Queue>() {
-            @Override
-            public void done(List<Queue> objects, ParseException e) {
-                if (e == null) {
-                    Log.d("no error", objects.toString());
-                    ArrayList<String> trackURIs = new ArrayList<>();
-                    for (int i = 0; i < objects.size(); i++) {
-                        trackURIs.add("spotify:track:" + objects.get(i).getTrackID());
-                    }
-                    Log.d("trackURIs", trackURIs.toString());
-                    playConfig = PlayConfig.createFor(trackURIs);
-                    playButton.setClickable(true);
-                    pauseButton.setClickable(true);
-                    previousButton.setClickable(true);
-                    nextButton.setClickable(true);
-
-                    mPlayer.play(playConfig);
-                    mPlayer.pause();
-                } else
-                    Log.e("error", e.getMessage());
-            }
-        });
-    }
-
-    @Override
-    public void onLoggedIn() {
-        Log.d("MainActivity", "User logged in");
-    }
-
-    @Override
-    public void onLoggedOut() {
-        Log.d("MainActivity", "User logged out");
-    }
-
-    @Override
-    public void onLoginFailed(Throwable throwable) {
-        Log.d("MainActivity", "Login failed");
-    }
-
-    @Override
-    public void onTemporaryError() {
-        Log.d("MainActivity", "Temporary error occurred");
-    }
-
-    @Override
-    public void onConnectionMessage(String s) {
-        Log.d("MainActivity", "Received connection message: " + s);
-    }
-
-
-    @Override
-    public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-        Log.d("MainActivity", "Playback event received: " + eventType.name());
-        switch (eventType) {
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onPlaybackError(ErrorType errorType, String s) {
-        Log.d("MainActivity", "Playback error received: " + errorType.name());
-        switch (errorType) {
-            default:
-                break;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        Spotify.destroyPlayer(this);
-        super.onDestroy();
     }
 
     @Override
