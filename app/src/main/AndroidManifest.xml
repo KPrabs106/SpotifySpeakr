@@ -38,7 +38,7 @@
         <service android:name="com.parse.PushService" />
 
         <receiver
-            android:name="com.kartikprabhu.spotifyspeakr.CustomParseReceiver"
+            android:name="com.kartikprabhu.spotifyspeakr.MainActivity$CustomParseReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -57,10 +57,6 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".SpotifyMusicPlayer"
-            android:label="@string/title_activity_spotify_music_player"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

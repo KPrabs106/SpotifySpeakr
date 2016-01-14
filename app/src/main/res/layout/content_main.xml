@@ -12,21 +12,12 @@
     tools:context="com.kartikprabhu.spotifyspeakr.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ImageButton
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:clickable="false"
-        android:src="@drawable/ic_play" />
-
     <android.support.design.widget.TextInputLayout
         android:id="@+id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/play_button"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         app:errorEnabled="true">
 
         <EditText
@@ -37,4 +28,60 @@
         android:layout_alignParentStart="true"
             android:hint="trackURI" />
     </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_input_layout"
+        android:text="Start Playback" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/startButton"
+        android:layout_alignEnd="@+id/text_input_layout"
+        android:text="Stop Playback" />
+
+    <ImageButton
+        android:id="@+id/play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:clickable="false"
+        android:src="@drawable/ic_play" />
+
+    <ImageButton
+        android:id="@+id/pause_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:clickable="false"
+        android:src="@drawable/ic_pause"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/previous_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/play_button"
+        android:clickable="false"
+        android:src="@drawable/ic_skip_previous" />
+
+    <ImageButton
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/play_button"
+        android:clickable="false"
+        android:src="@drawable/ic_skip_next" />
+
 </RelativeLayout>
