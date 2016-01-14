@@ -3,6 +3,7 @@ package com.kartikprabhu.spotifyspeakr;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -41,10 +42,15 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
     private static final String CLIENT_ID = "4723a618582148fa80b22e70b2cac6bc";
     private static final String REDIRECT_URI = "spotifyspeakr://callback/";
     private static final int REQUEST_CODE = 1738;
+
     static MainActivity mainActivity;
-    HashMap<String, String> params = new HashMap<String, String>();
+
+    HashMap<String, String> params = new HashMap<>();
+
     String offset;
+
     Player mPlayer;
+    Handler handler;
     private Button startButton;
     private ImageButton playButton;
     private ImageButton pauseButton;
@@ -61,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        handler = new Handler();
 
         mainActivity = this;
 
@@ -173,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                 Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
                     @Override
                     public void onInitialized(Player player) {
-                        Log.e("player", "initialized");
                         mPlayer = player;
                         mPlayer.addConnectionStateCallback(MainActivity.this);
                         mPlayer.addPlayerNotificationCallback(MainActivity.this);
@@ -186,6 +193,67 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                 });
             }
         }
+    }
+
+    private void startPlayingMusic(String time, final String trackURI) throws InterruptedException {
+        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPlayer.play("spotify:track:" + trackURI);
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
+            }
+        }, timeToWait);
+    }
+
+    private void resumeMusic(String time) throws InterruptedException {
+        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPlayer.resume();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
+            }
+        }, timeToWait);
+    }
+
+    private void pauseMusic(String time) throws InterruptedException {
+        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPlayer.pause();
+                playButton.setVisibility(View.VISIBLE);
+                pauseButton.setVisibility(View.INVISIBLE);
+            }
+        }, timeToWait);
+    }
+
+    private void previousTrack(String time) throws InterruptedException {
+        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPlayer.skipToPrevious();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
+            }
+        }, timeToWait);
+    }
+
+    private void nextTrack(String time) throws InterruptedException {
+        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPlayer.skipToNext();
+                playButton.setVisibility(View.INVISIBLE);
+                pauseButton.setVisibility(View.VISIBLE);
+            }
+        }, timeToWait);
+
     }
 
     @Override
@@ -257,47 +325,6 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void startPlayingMusic(String time, String trackURI) throws InterruptedException {
-        Log.e("trackURI", trackURI);
-        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
-        Thread.sleep(timeToWait);
-        mPlayer.play("spotify:track:" + trackURI);
-        playButton.setVisibility(View.INVISIBLE);
-        pauseButton.setVisibility(View.VISIBLE);
-    }
-
-    private void resumeMusic(String time) throws InterruptedException {
-        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
-        Thread.sleep(timeToWait);
-        mPlayer.resume();
-        playButton.setVisibility(View.INVISIBLE);
-        pauseButton.setVisibility(View.VISIBLE);
-    }
-
-    private void pauseMusic(String time) throws InterruptedException {
-        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
-        Thread.sleep(timeToWait);
-        mPlayer.pause();
-        playButton.setVisibility(View.VISIBLE);
-        pauseButton.setVisibility(View.INVISIBLE);
-    }
-
-    private void previousTrack(String time) throws InterruptedException {
-        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
-        Thread.sleep(timeToWait);
-        mPlayer.skipToPrevious();
-        playButton.setVisibility(View.INVISIBLE);
-        pauseButton.setVisibility(View.VISIBLE);
-    }
-
-    private void nextTrack(String time) throws InterruptedException {
-        long timeToWait = Long.parseLong(time) - Long.parseLong(offset) - System.currentTimeMillis();
-        Thread.sleep(timeToWait);
-        mPlayer.skipToNext();
-        playButton.setVisibility(View.INVISIBLE);
-        pauseButton.setVisibility(View.VISIBLE);
     }
 
     public static class CustomParseReceiver extends ParsePushBroadcastReceiver {
