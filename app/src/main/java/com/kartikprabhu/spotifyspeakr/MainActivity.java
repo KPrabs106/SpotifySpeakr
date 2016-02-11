@@ -13,8 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.parse.FunctionCallback;
 import com.parse.Parse;
 import com.parse.ParseCloud;
@@ -31,11 +34,14 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity implements PlayerNotificationCallback, ConnectionStateCallback {
 
@@ -51,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
 
     Player mPlayer;
     Handler handler;
+    private ImageView albumArt;
+    private TextView trackName;
+    private TextView trackArtist;
     private Button startButton;
     private ImageButton playButton;
     private ImageButton pauseButton;
@@ -76,6 +85,10 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         params.put("X-Parse-REST-API-Key", getResources().getString(R.string.api_key));
         params.put("Content-Type", "application/json");
 
+        albumArt = (ImageView) findViewById(R.id.albumArt);
+        trackName = (TextView) findViewById(R.id.trackName);
+        trackArtist = (TextView) findViewById(R.id.trackArtist);
+
         playButton = (ImageButton) findViewById(R.id.play_button);
         pauseButton = (ImageButton) findViewById(R.id.pause_button);
         previousButton = (ImageButton) findViewById(R.id.previous_button);
@@ -84,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
 
         startButton = (Button) findViewById(R.id.startButton);
         final EditText desiredTrack = (EditText) findViewById(R.id.editText);
-        desiredTrack.setText("0JHQtpBqKqjmJN6qcmjiU6");
+        desiredTrack.setText("17Q87zeXgsAi9iQQbMu9v0");
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,9 +297,21 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
     @Override
     public void onPlaybackEvent(PlayerNotificationCallback.EventType eventType, PlayerState playerState) {
         Log.d("MainActivity", "Playback event received: " + eventType.name());
-        switch (eventType) {
-            default:
-                break;
+        if (eventType.equals(EventType.TRACK_CHANGED)) {
+            SpotifyRestClient.getTrackDetails(playerState.trackUri.substring(14), null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    try {
+                        String pictureURL = response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url");
+                        trackName.setText(response.getString("name"));
+                        trackArtist.setText(response.getJSONArray("artists").getJSONObject(0).getString("name"));
+                        Picasso.with(getApplicationContext()).load(pictureURL).into(albumArt);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
