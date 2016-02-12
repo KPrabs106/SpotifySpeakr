@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +38,7 @@ import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,6 +100,28 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
 
         startButton = (Button) findViewById(R.id.startButton);
         final EditText desiredTrack = (EditText) findViewById(R.id.editText);
+        desiredTrack.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String query = String.valueOf(desiredTrack.getText());
+                SpotifyRestClient.searchTrack(query, null, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                    }
+                });
+            }
+        });
         desiredTrack.setText("17Q87zeXgsAi9iQQbMu9v0");
 
         startButton.setOnClickListener(new View.OnClickListener() {
