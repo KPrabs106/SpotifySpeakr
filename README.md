@@ -1,4 +1,9 @@
-<img src="https://i.imgur.com/5opwPBL.png" height="750">
+<table>
+<tr>
+<td><img src="https://i.imgur.com/5opwPBL.png" height="750"></td>
+<td><img src="https://i.imgur.com/8V7ZdA9.png" height="750"></td>
+</tr>
+</table>
 ## Introduction
 You're with a group of friends and want to play some music from Spotify. Without a dedicated speaker, there's no way that the music will be loud enough for everyone to enjoyably listen. But what if you could use the in-built speakers on everyone's phone instead?
 
