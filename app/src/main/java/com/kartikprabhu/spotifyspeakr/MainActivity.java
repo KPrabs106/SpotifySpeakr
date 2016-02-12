@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +36,6 @@ import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
 
     private static final String CLIENT_ID = "4723a618582148fa80b22e70b2cac6bc";
     private static final String REDIRECT_URI = "spotifyspeakr://callback/";
-    private static final int REQUEST_CODE = 1738;
+    private static final int SPOTIFY_REQUEST_CODE = 1738;
+
+    private static final int PICKED_REQUEST_CODE = 1234;
 
     static MainActivity mainActivity;
 
@@ -97,32 +96,16 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         previousButton = (ImageButton) findViewById(R.id.previous_button);
         nextButton = (ImageButton) findViewById(R.id.next_button);
 
-
         startButton = (Button) findViewById(R.id.startButton);
         final EditText desiredTrack = (EditText) findViewById(R.id.editText);
-        desiredTrack.addTextChangedListener(new TextWatcher() {
+        desiredTrack.setText("17Q87zeXgsAi9iQQbMu9v0");
+
+        findViewById(R.id.searchButton).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String query = String.valueOf(desiredTrack.getText());
-                SpotifyRestClient.searchTrack(query, null, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-
-                    }
-                });
+            public void onClick(View v) {
+                startActivityForResult(new Intent(getApplicationContext(), SearchActivity.class), PICKED_REQUEST_CODE);
             }
         });
-        desiredTrack.setText("17Q87zeXgsAi9iQQbMu9v0");
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,13 +189,13 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         builder.setScopes(new String[]{"user-read-private", "streaming"});
         AuthenticationRequest request = builder.build();
 
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+        AuthenticationClient.openLoginActivity(this, SPOTIFY_REQUEST_CODE, request);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == SPOTIFY_REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, data);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
@@ -230,6 +213,19 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
                     }
                 });
             }
+        } else if (requestCode == PICKED_REQUEST_CODE) {
+            String pickedTrackURI = data.getStringExtra("trackURI");
+            params.put("trackuri", pickedTrackURI);
+            ParseCloud.callFunctionInBackground("playMusic", params, new FunctionCallback<Object>() {
+                @Override
+                public void done(Object object, ParseException e) {
+                    if (e != null) {
+                        Log.e("Server error", e.getMessage());
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Your track will start playing in less than 10 seconds", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 

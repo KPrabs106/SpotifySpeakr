@@ -19,7 +19,7 @@ public class SpotifyRestClient {
 
     public static void searchTrack(String query, RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
 
-        String modifiedURL = BASE_URL + "search?q=" + query.replaceAll(" ", "%20") + "&type=track,artist";
+        String modifiedURL = BASE_URL + "search?q=" + query.replaceAll(" ", "%20") + "&type=track&market=US&limit=10";
         asyncHttpClient.get(modifiedURL, requestParams, responseHandler);
     }
 }
