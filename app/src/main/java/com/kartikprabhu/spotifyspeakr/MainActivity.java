@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -96,31 +95,10 @@ public class MainActivity extends AppCompatActivity implements PlayerNotificatio
         previousButton = (ImageButton) findViewById(R.id.previous_button);
         nextButton = (ImageButton) findViewById(R.id.next_button);
 
-        startButton = (Button) findViewById(R.id.startButton);
-        final EditText desiredTrack = (EditText) findViewById(R.id.editText);
-        desiredTrack.setText("17Q87zeXgsAi9iQQbMu9v0");
-
         findViewById(R.id.searchButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(new Intent(getApplicationContext(), SearchActivity.class), PICKED_REQUEST_CODE);
-            }
-        });
-
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                params.put("trackuri", String.valueOf(desiredTrack.getText()));
-                ParseCloud.callFunctionInBackground("playMusic", params, new FunctionCallback<Object>() {
-                    @Override
-                    public void done(Object object, ParseException e) {
-                        if (e != null) {
-                            Log.e("Server error", e.getMessage());
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Your track will start playing in less than 10 seconds", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
             }
         });
 

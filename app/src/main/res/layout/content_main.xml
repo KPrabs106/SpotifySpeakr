@@ -12,47 +12,13 @@
     tools:context="com.kartikprabhu.spotifyspeakr.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/text_input_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/next_button"
-        app:errorEnabled="true">
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-            android:layout_above="@+id/text_input_layout"
-        android:layout_alignParentStart="true"
-            android:hint="trackURI" />
-    </android.support.design.widget.TextInputLayout>
-
     <ImageButton
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/text_input_layout"
-        android:layout_toEndOf="@+id/text_input_layout"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:src="@android:drawable/ic_menu_search" />
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/text_input_layout"
-        android:text="Start Playback" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/albumArt"
-        android:layout_alignEnd="@+id/next_button"
-        android:text="Stop Playback" />
 
     <ImageButton
         android:id="@+id/play_button"
@@ -61,10 +27,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:clickable="false"
-        android:maxHeight="15dp"
-        android:maxWidth="15dp"
+        android:maxHeight="20dp"
+        android:maxWidth="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_play" />
+        android:src="@android:drawable/ic_media_play" />
 
     <ImageButton
         android:id="@+id/pause_button"
@@ -73,10 +39,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:clickable="false"
-        android:maxHeight="15dp"
-        android:maxWidth="15dp"
+        android:maxHeight="20dp"
+        android:maxWidth="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_pause"
+        android:src="@android:drawable/ic_media_pause"
         android:visibility="invisible" />
 
     <ImageButton
@@ -86,10 +52,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/play_button"
         android:clickable="false"
-        android:maxHeight="15dp"
-        android:maxWidth="15dp"
+        android:maxHeight="20dp"
+        android:maxWidth="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_skip_previous" />
+        android:src="@android:drawable/ic_media_previous" />
 
     <ImageButton
         android:id="@+id/next_button"
@@ -98,23 +64,23 @@
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/play_button"
         android:clickable="false"
-        android:maxHeight="15dp"
-        android:maxWidth="15dp"
+        android:maxHeight="20dp"
+        android:maxWidth="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_skip_next" />
+        android:src="@android:drawable/ic_media_next" />
 
     <ImageView
         android:id="@+id/albumArt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/startButton"
+        android:layout_above="@+id/trackName"
         android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/trackName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/albumArt"
+        android:layout_above="@+id/trackArtist"
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
@@ -123,7 +89,7 @@
         android:id="@+id/trackArtist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/trackName"
+        android:layout_above="@+id/play_button"
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
